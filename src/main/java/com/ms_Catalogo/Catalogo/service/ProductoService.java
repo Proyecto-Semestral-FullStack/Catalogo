@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,23 +27,15 @@ public class ProductoService {
 
     // Obtener todos (con opción de filtros simples)
     @Transactional(readOnly = true)
-    public List<ProductoResponseDTO> listarProductos(String nombre, Long categoriaId, String ordenar) {
-        List<Producto> productos;
-
-        if (nombre != null && !nombre.isEmpty() && categoriaId != null) {
-            productos = productoRepository.findByNombreContainingIgnoreCaseAndCategoriaId(nombre, categoriaId);
-        } else if (nombre != null && !nombre.isEmpty()) {
-            productos = productoRepository.findByNombreContainingIgnoreCase(nombre);
-        } else if (categoriaId != null) {
-            productos = productoRepository.findByCategoriaId(categoriaId);
-        } else if ("precio".equalsIgnoreCase(ordenar)) {
-            productos = productoRepository.findAllByOrderByPrecioAsc();
-        } else {
-            productos = productoRepository.findAll();
-        }
-
-        return productos.stream().map(this::convertirADto).collect(Collectors.toList());
+    public List<ProductoResponseDTO> listarProductos(String nombre, Long categoriaId, BigDecimal minPrecio, BigDecimal maxPrecio, String ordenar) {
+        List<Producto> productos = productoRepository.buscarConFiltros(
+                nombre, categoriaId, minPrecio, maxPrecio, ordenar);
+        return productos.stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
+
+
 
     @Transactional(readOnly = true)
     public ProductoResponseDTO obtenerProducto(Long id) {

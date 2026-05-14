@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,9 +22,12 @@ public class ProductoController {
     public ResponseEntity<List<ProductoResponseDTO>> listar(
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) Long categoriaId,
+            @RequestParam(required = false) BigDecimal minPrecio,
+            @RequestParam(required = false) BigDecimal maxPrecio,
             @RequestParam(required = false, defaultValue = "nombre") String ordenar)
     {
-        List<ProductoResponseDTO> productos = productoService.listarProductos(nombre, categoriaId, ordenar);
+        List<ProductoResponseDTO> productos = productoService.listarProductos(
+                nombre, categoriaId, minPrecio, maxPrecio, ordenar);
         if (productos.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
