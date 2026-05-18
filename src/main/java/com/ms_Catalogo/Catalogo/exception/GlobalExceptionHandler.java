@@ -1,5 +1,7 @@
 package com.ms_Catalogo.Catalogo.exception;
 
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(RecursoNoEncontradoException.class)
@@ -70,12 +73,23 @@ public class GlobalExceptionHandler {
     // 6. Cualquier otra excepción no controlada - 500
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> manejarErrorGeneral(Exception ex) {
+        log.error("Error interno no controlado: {}", ex.getMessage(), ex);  // registro completo solo en el servidor
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Error interno del servidor: " + ex.getMessage(),
+                "Error interno del servidor. Contacte al administrador.",
                 LocalDateTime.now()
         );
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);}
+
+
+    @ExceptionHandler(StorageException.class)
+    public ResponseEntity<ErrorResponse> manejarErrorStorage(StorageException ex) {
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_GATEWAY.value(),   // 502
+                ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_GATEWAY);}
+
 
 }
