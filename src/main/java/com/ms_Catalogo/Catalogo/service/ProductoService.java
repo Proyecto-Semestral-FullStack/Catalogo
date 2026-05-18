@@ -122,4 +122,14 @@ public class ProductoService {
                 .activo(producto.getActivo())
                 .build();
     }
+
+
+    public ProductoResponseDTO asignarImagen(Long productoId, MultipartFile archivo) {
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
+        ArchivoResponseDTO imagen = storageClient.uploadFile(archivo);
+        producto.setImagenId(imagen.getId());
+        productoRepository.save(producto);
+        return convertirADto(producto);
+    }
 }

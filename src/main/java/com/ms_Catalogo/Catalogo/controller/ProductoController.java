@@ -20,6 +20,7 @@ import java.util.List;
 public class ProductoController {
     private final ProductoService productoService;
 
+    // Listar productos (sin cambios)
     @GetMapping
     public ResponseEntity<List<ProductoResponseDTO>> listar(
             @RequestParam(required = false) String nombre,
@@ -36,37 +37,30 @@ public class ProductoController {
         return ResponseEntity.ok(productos);
     }
 
+    // Obtener producto por ID (sin cambios)
     @GetMapping("/{id}")
     public ResponseEntity<ProductoResponseDTO> obtener(@PathVariable Long id) {
         ProductoResponseDTO dto = productoService.obtenerProducto(id);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        productoService.eliminarProducto(id);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    // Metodo (solo JSON) – se conserva compatibilidad
+    // Crear producto – solo JSON (sin imagen)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductoResponseDTO> crear(@Valid @RequestBody ProductoRequestDTO dto) {
-        // Como no hay archivo, pasamos null al servicio
+        // No se recibe archivo, se crea el producto con imagenId = null
         ProductoResponseDTO creado = productoService.crearProducto(dto, null);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
-    //Nuevo metodo (JSON + imagen opcional) – multipart
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductoResponseDTO> crearConImagen(
-            @Valid @RequestPart("producto") ProductoRequestDTO dto,
-            @RequestPart(value = "archivo", required = false) MultipartFile archivo) {
-        ProductoResponseDTO creado = productoService.crearProducto(dto, archivo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(creado);
+    // Subir imagen a un producto existente – multipart con solo archivo
+    @PostMapping(path = "/{id}/imagen", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductoResponseDTO> subirImagen(@PathVariable Long id,
+                                                           @RequestPart("archivo") MultipartFile archivo) {
+        ProductoResponseDTO actualizado = productoService.asignarImagen(id,archivo);
+        return ResponseEntity.ok(actualizado);
     }
 
-    // Actualizar solo JSON
+    // Actualizar producto – solo JSON (sin imagen)
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProductoResponseDTO> actualizar(@PathVariable Long id,
                                                           @Valid @RequestBody ProductoRequestDTO dto) {
@@ -74,15 +68,11 @@ public class ProductoController {
         return ResponseEntity.ok(actualizado);
     }
 
-    //  Actualizar con imagen opcional
-    @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ProductoResponseDTO> actualizarConImagen(
-            @PathVariable Long id,
-            @Valid @RequestPart("producto") ProductoRequestDTO dto,
-            @RequestPart(value = "archivo", required = false) MultipartFile archivo) {
-        ProductoResponseDTO actualizado = productoService.actualizarProducto(id, dto, archivo);
-        return ResponseEntity.ok(actualizado);
+    // Eliminar producto (soft delete, sin cambios)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        productoService.eliminarProducto(id);
+        return ResponseEntity.noContent().build();
     }
-
 
 }
