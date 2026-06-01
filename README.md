@@ -38,17 +38,11 @@ Microservicio de catálogo de productos. Gestiona productos, categorías y sus r
 1. **Base de datos:** crear manualmente la BD `db_catalogo` en MySQL (XAMPP).
 2. **Configurar `application.properties`:**
    ```properties
-   server.port=8082
-   spring.datasource.url=jdbc:mysql://localhost:3306/db_catalogo
-   spring.datasource.username=root
-   spring.datasource.password=
-   spring.jpa.hibernate.ddl-auto=update
-   # URL del servicio de storage (cuando esté disponible)
-   storage.service.url=http://localhost:8088
-
+   -----
    Ejecutar: mvn spring-boot:run o desde IntelliJ.
 
-Probar: usar Postman en http://localhost:8082/api/productos.
+Por la implementacion de ApiGateway
+Probar: usar Postman en http://localhost:8080/api/productos
 
 📂 Repositorio y rama
 Rama principal: main
