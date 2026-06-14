@@ -60,7 +60,7 @@ public class CategoriaService {
         categoriaRepository.delete(categoria);
     }
 
-    // Método auxiliar para convertir Categoría a DTO
+    // Metodo auxiliar para convertir Categoría a DTO
     private CategoriaResponseDTO convertirAResponseDTO(Categoria categoria) {
         return CategoriaResponseDTO.builder()
                 .id(categoria.getId())
