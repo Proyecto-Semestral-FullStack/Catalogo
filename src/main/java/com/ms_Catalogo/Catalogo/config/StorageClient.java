@@ -1,4 +1,4 @@
-package com.ms_Catalogo.Catalogo.webclient;
+package com.ms_Catalogo.Catalogo.config;
 
 //Es para que se conecte con storage subir imagenes es el unico servicio que consume directaente Catalogo
 
