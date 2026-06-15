@@ -354,7 +354,7 @@ class ProductoServiceTest {
         when(productoRepository.findById(90L)).thenReturn(Optional.of(p));
 
         MultipartFile archivo = mock(MultipartFile.class);
-        when(archivo.isEmpty()).thenReturn(false);
+        //when(archivo.isEmpty()).thenReturn(false);
 
         when(storageClient.uploadFile(archivo)).thenThrow(new com.ms_Catalogo.Catalogo.exception.StorageException("Storage down"));
 
@@ -362,6 +362,45 @@ class ProductoServiceTest {
         assertThrows(com.ms_Catalogo.Catalogo.exception.StorageException.class, () -> productoService.asignarImagen(90L, archivo));
         verify(storageClient, times(1)).uploadFile(archivo);
         verify(productoRepository, never()).save(any(Producto.class));
+    }
+
+    // Agregar estos tests al final de ProductoServiceTest.java existente:
+
+    @Test
+    void asignarImagen_byId_assignsAndSavesProduct() {
+        // Given
+        Producto p = new Producto();
+        p.setId(60L);
+        p.setImagenId(null);
+
+        Categoria cat = new Categoria();
+        cat.setId(1L);
+        cat.setNombre("Categoria");
+        p.setCategoria(cat);
+
+        when(productoRepository.findById(60L)).thenReturn(Optional.of(p));
+        when(productoRepository.save(any(Producto.class))).thenReturn(p);
+
+        // When
+        productoService.asignarImagen(60L, 77L);
+
+        // Then
+        assertEquals(77L, p.getImagenId());
+        verify(productoRepository, times(1)).findById(60L);
+        verify(productoRepository, times(1)).save(any(Producto.class));
+    }
+
+    @Test
+    void asignarImagen_byId_throwsWhenProductNotFound() {
+        // Given
+        when(productoRepository.findById(999L)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(RecursoNoEncontradoException.class,
+                () -> productoService.asignarImagen(999L, 77L));
+
+        verify(productoRepository, times(1)).findById(999L);
+        verify(productoRepository, never()).save(any());
     }
 }
 
