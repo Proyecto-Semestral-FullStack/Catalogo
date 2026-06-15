@@ -9,7 +9,6 @@ import com.ms_Catalogo.Catalogo.model.Categoria;
 import com.ms_Catalogo.Catalogo.model.Producto;
 import com.ms_Catalogo.Catalogo.repository.CategoriaRepository;
 import com.ms_Catalogo.Catalogo.repository.ProductoRepository;
-import com.ms_Catalogo.Catalogo.config.StorageClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
 public class ProductoService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
-    private final StorageClient storageClient;   // Nuevo cliente de Storage
+    private final StorageClients storageClient;   // Nuevo cliente de Storage
     private final InventarioClient inventarioClient;  // Nuevo cliente inventario --relacion bidirecional
 
     @Transactional(readOnly = true)
