@@ -1,6 +1,7 @@
 package com.ms_Catalogo.Catalogo.service;
 
 import com.ms_Catalogo.Catalogo.config.InventarioClient;
+import com.ms_Catalogo.Catalogo.config.StorageClient;
 import com.ms_Catalogo.Catalogo.dto.ArchivoResponseDTO;
 import com.ms_Catalogo.Catalogo.dto.ProductoRequestDTO;
 import com.ms_Catalogo.Catalogo.dto.ProductoResponseDTO;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 public class ProductoService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
-    private final StorageClients storageClient;   // Nuevo cliente de Storage
+    private final StorageClient storageClient;   // Nuevo cliente de Storage
     private final InventarioClient inventarioClient;  // Nuevo cliente inventario --relacion bidirecional
 
     @Transactional(readOnly = true)
