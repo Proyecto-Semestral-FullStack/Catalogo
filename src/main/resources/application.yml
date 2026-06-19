@@ -28,7 +28,3 @@ eureka:
   instance:
     lease-renewal-interval-in-seconds: 10
     lease-expiration-duration-in-seconds: 30
-
-storage:
-  service:
-    url: lb://ms-storage  #Por el momento porque aun tiene webclient pero si se adapta a Feign se puede sacar
