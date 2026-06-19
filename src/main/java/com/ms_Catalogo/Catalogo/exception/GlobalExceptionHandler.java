@@ -1,6 +1,7 @@
 package com.ms_Catalogo.Catalogo.exception;
 
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,20 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ErrorResponse> manejarErrorFeign(FeignException ex) {
+        log.error("Error de comunicación con microservicio: {}", ex.getMessage());
+
+        int status = ex.status() > 0 ? ex.status() : 503;
+
+        ErrorResponse error = new ErrorResponse(
+                status,
+                "Error al comunicarse con un servicio externo: " + ex.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.valueOf(status));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
