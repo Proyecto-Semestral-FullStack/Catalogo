@@ -1,5 +1,7 @@
 package com.ms_Catalogo.Catalogo.service;
 
+import com.ms_Catalogo.Catalogo.config.InventarioClient;
+import com.ms_Catalogo.Catalogo.config.StorageClient;
 import com.ms_Catalogo.Catalogo.dto.ArchivoResponseDTO;
 import com.ms_Catalogo.Catalogo.dto.ProductoRequestDTO;
 import com.ms_Catalogo.Catalogo.dto.ProductoResponseDTO;
@@ -8,7 +10,6 @@ import com.ms_Catalogo.Catalogo.model.Categoria;
 import com.ms_Catalogo.Catalogo.model.Producto;
 import com.ms_Catalogo.Catalogo.repository.CategoriaRepository;
 import com.ms_Catalogo.Catalogo.repository.ProductoRepository;
-import com.ms_Catalogo.Catalogo.webclient.StorageClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,8 @@ import java.util.stream.Collectors;
 public class ProductoService {
     private final ProductoRepository productoRepository;
     private final CategoriaRepository categoriaRepository;
-    private final StorageClient storageClient;   // ← Nuevo cliente de Storage
+    private final StorageClient storageClient;   // Nuevo cliente de Storage
+    private final InventarioClient inventarioClient;  // Nuevo cliente inventario --relacion bidirecional
 
     @Transactional(readOnly = true)
     public List<ProductoResponseDTO> listarProductos(String nombre, Long categoriaId,
@@ -47,7 +49,7 @@ public class ProductoService {
         return convertirADto(producto);
     }
 
-    // ✅ Método crear modificado para recibir un archivo opcional
+
     public ProductoResponseDTO crearProducto(ProductoRequestDTO dto, MultipartFile archivo) {
         Categoria categoria = categoriaRepository.findById(dto.getCategoriaId())
                 .orElseThrow(() -> new RecursoNoEncontradoException("Categoría con ID " + dto.getCategoriaId() + " no existe"));
@@ -70,7 +72,7 @@ public class ProductoService {
         return convertirADto(producto);
     }
 
-    // ✅ Método actualizar modificado para recibir un archivo opcional
+    // Metodo actualizar modificado para recibir un archivo opcional
     public ProductoResponseDTO actualizarProducto(Long id, ProductoRequestDTO dto, MultipartFile archivo) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto con ID " + id + " no encontrado"));
@@ -102,15 +104,6 @@ public class ProductoService {
         log.info("Producto desactivado: id={}", id);
     }
 
-    // Método auxiliar que ya tenías (por si necesitas asignar manualmente una imagen después)
-    public void asignarImagen(Long productoId, Long imagenId) {
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
-        producto.setImagenId(imagenId);
-        productoRepository.save(producto);
-        log.info("Imagen asignada al producto {}: imagenId={}", productoId, imagenId);
-    }
-
     private ProductoResponseDTO convertirADto(Producto producto) {
         return ProductoResponseDTO.builder()
                 .id(producto.getId())
@@ -129,6 +122,7 @@ public class ProductoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
         ArchivoResponseDTO imagen = storageClient.uploadFile(archivo);
         producto.setImagenId(imagen.getId());
+        log.info("Imagen asignada al producto {}: imagenId={}", productoId, imagen.getId());
         productoRepository.save(producto);
         return convertirADto(producto);
     }

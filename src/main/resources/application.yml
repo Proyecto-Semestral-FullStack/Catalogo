@@ -1,0 +1,30 @@
+#este por el momento es el aplication-local... La idea es tener un archivo por cada entorno [local,test,prod]
+
+spring:
+  application:
+    name: ms-catalogo
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_catalogo
+    username: root
+    password: 
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+  main:
+    web-application-type: servlet
+
+server:
+  port: 8082
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
